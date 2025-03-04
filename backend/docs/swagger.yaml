@@ -1,0 +1,974 @@
+basePath: /
+definitions:
+  models.Button:
+    properties:
+      action:
+        example: create
+        type: string
+      code:
+        example: create
+        type: string
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      menu_id:
+        example: 1
+        type: integer
+      name:
+        example: 创建用户
+        type: string
+      permission_code:
+        example: user:create
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Menu:
+    properties:
+      button_association:
+        example: false
+        type: boolean
+      component:
+        example: '@/views/system/index'
+        type: string
+      created_at:
+        type: string
+      icon:
+        example: setting
+        type: string
+      id:
+        example: 1
+        type: integer
+      is_visible:
+        example: true
+        type: boolean
+      meta:
+        $ref: '#/definitions/models.MenuMeta'
+      name:
+        example: 系统管理
+        type: string
+      order:
+        example: 1
+        type: integer
+      parent_id:
+        example: 0
+        type: integer
+      path:
+        example: /system
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.MenuMeta:
+    properties:
+      icon:
+        type: string
+      title:
+        type: string
+    type: object
+  models.Permission:
+    properties:
+      button_id:
+        example: 1
+        type: integer
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      menu_id:
+        example: 1
+        type: integer
+      name:
+        example: 查看仪表盘
+        type: string
+      permission_code:
+        example: view_dashboard
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+      type:
+        example: menu
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.Role:
+    properties:
+      created_at:
+        type: string
+      description:
+        example: 系统管理员角色
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: 管理员
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/models.Permission'
+        type: array
+      updated_at:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      password:
+        example: password123
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+      updated_at:
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  services.RouteItem:
+    properties:
+      children:
+        items:
+          $ref: '#/definitions/services.RouteItem'
+        type: array
+      component:
+        type: string
+      meta:
+        $ref: '#/definitions/services.RouteMeta'
+      name:
+        type: string
+      path:
+        type: string
+    type: object
+  services.RouteMeta:
+    properties:
+      activeIcon:
+        type: string
+      authority:
+        items:
+          type: integer
+        type: array
+      darkIcon:
+        type: string
+      icon:
+        type: string
+      order:
+        type: integer
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: 租户中心系统的API文档
+  title: 租户中心API
+  version: "1.0"
+paths:
+  /api/buttons:
+    post:
+      consumes:
+      - application/json
+      description: 创建新按钮，需要管理员权限
+      parameters:
+      - description: 按钮信息
+        in: body
+        name: button
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 按钮创建成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 创建按钮失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 按钮管理
+  /api/buttons/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 更新指定按钮的信息，需要管理员权限
+      parameters:
+      - description: 按钮ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 按钮信息
+        in: body
+        name: button
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 按钮信息更新成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 更新按钮信息失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 按钮管理
+  /api/buttons/{id}/permission:
+    post:
+      consumes:
+      - application/json
+      description: 为指定按钮绑定权限，需要管理员权限
+      parameters:
+      - description: 按钮ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 权限信息
+        in: body
+        name: permission
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限绑定成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 绑定权限失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 按钮管理
+  /api/buttons/{id}/permissions:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定按钮的权限列表，需要管理员权限
+      parameters:
+      - description: 按钮ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "400":
+          description: 无效的按钮ID
+          schema:
+            type: object
+        "500":
+          description: 获取按钮权限列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 按钮管理
+  /api/buttons/menu/{menuId}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定菜单的所有按钮列表，需要管理员权限
+      parameters:
+      - description: 菜单ID
+        in: path
+        name: menuId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 按钮列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Button'
+            type: array
+        "400":
+          description: 无效的菜单ID
+          schema:
+            type: object
+        "500":
+          description: 获取按钮列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 按钮管理
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录接口，验证用户名和密码，返回JWT token
+      parameters:
+      - description: 登录信息
+        in: body
+        name: loginData
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功，返回token
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "401":
+          description: 用户名或密码错误
+          schema:
+            type: object
+      tags:
+      - 用户管理
+  /api/menus:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有菜单的列表，需要管理员权限
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 菜单列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+        "500":
+          description: 获取菜单列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新菜单，需要管理员权限
+      parameters:
+      - description: 菜单信息
+        in: body
+        name: menu
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 菜单创建成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 创建菜单失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+  /api/menus/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 更新指定菜单的信息，需要管理员权限
+      parameters:
+      - description: 菜单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 菜单信息
+        in: body
+        name: menu
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 菜单信息更新成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 更新菜单信息失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+  /api/menus/{id}/permission:
+    post:
+      consumes:
+      - application/json
+      description: 为指定菜单绑定权限，需要管理员权限
+      parameters:
+      - description: 菜单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 权限信息
+        in: body
+        name: permission
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限绑定成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 绑定权限失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+  /api/menus/{id}/permissions:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定菜单的权限列表，需要管理员权限
+      parameters:
+      - description: 菜单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "400":
+          description: 无效的菜单ID
+          schema:
+            type: object
+        "500":
+          description: 获取菜单权限列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+  /api/menus/parent/{parentId}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定父级菜单的子菜单列表，需要管理员权限
+      parameters:
+      - description: 父级菜单ID
+        in: path
+        name: parentId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 子菜单列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Menu'
+            type: array
+        "400":
+          description: 无效的父级菜单ID
+          schema:
+            type: object
+        "500":
+          description: 获取子菜单列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 菜单管理
+  /api/permissions:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有权限的列表，需要管理员权限
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "500":
+          description: 获取权限列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 权限管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新权限，需要管理员权限
+      parameters:
+      - description: 权限信息
+        in: body
+        name: permission
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 权限创建成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 创建权限失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 权限管理
+  /api/permissions/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 更新指定权限的信息，需要管理员权限
+      parameters:
+      - description: 权限ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 权限信息
+        in: body
+        name: permission
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限信息更新成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 更新权限信息失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 权限管理
+  /api/permissions/type/{type}:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定类型的所有权限列表，需要管理员权限
+      parameters:
+      - description: 权限类型
+        in: path
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "500":
+          description: 获取权限列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 权限管理
+  /api/roles:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有角色的列表，需要管理员权限
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 角色列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Role'
+            type: array
+        "500":
+          description: 获取角色列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 角色管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新角色，需要管理员权限
+      parameters:
+      - description: 角色信息
+        in: body
+        name: role
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 角色创建成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 创建角色失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 角色管理
+  /api/roles/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 更新指定角色的信息，需要管理员权限
+      parameters:
+      - description: 角色ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 角色信息
+        in: body
+        name: role
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 角色信息更新成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 更新角色信息失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 角色管理
+  /api/roles/{id}/permissions:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定角色的所有权限列表，需要管理员权限
+      parameters:
+      - description: 角色ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限列表
+          schema:
+            items:
+              $ref: '#/definitions/models.Permission'
+            type: array
+        "400":
+          description: 无效的角色ID
+          schema:
+            type: object
+        "500":
+          description: 获取角色权限列表失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 角色管理
+    post:
+      consumes:
+      - application/json
+      description: 为指定角色绑定一个或多个权限，需要管理员权限
+      parameters:
+      - description: 角色ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 权限ID列表
+        in: body
+        name: permissionIDs
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 权限绑定成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 绑定权限失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 角色管理
+  /api/users:
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户，需要管理员权限
+      parameters:
+      - description: 用户信息
+        in: body
+        name: user
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 用户创建成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 创建用户失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 用户管理
+  /api/users/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 更新指定用户的信息，需要管理员权限
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 用户信息
+        in: body
+        name: user
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 用户信息更新成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 更新用户信息失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 用户管理
+  /api/users/{id}/roles:
+    post:
+      consumes:
+      - application/json
+      description: 为指定用户绑定一个或多个角色，需要管理员权限
+      parameters:
+      - description: 用户ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 角色ID列表
+        in: body
+        name: roleIDs
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 角色绑定成功
+          schema:
+            type: object
+        "400":
+          description: 无效的请求参数
+          schema:
+            type: object
+        "500":
+          description: 绑定角色失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 用户管理
+  /api/users/routes:
+    get:
+      description: 获取用户的路由数据，包括菜单和权限信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 路由数据
+          schema:
+            items:
+              $ref: '#/definitions/services.RouteItem'
+            type: array
+        "400":
+          description: 无效的用户ID
+          schema:
+            type: object
+        "500":
+          description: 获取路由数据失败
+          schema:
+            type: object
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - 用户管理
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
